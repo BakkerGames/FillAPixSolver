@@ -42,7 +42,7 @@ namespace FillAPixSolver
                             MarkNotFilled(puzzle, x, y);
                             changed = true;
                         }
-                        else if (value == filled + empty)
+                        else if (value == 9 - notFilled)
                         {
                             MarkFilled(puzzle, x, y);
                             changed = true;
