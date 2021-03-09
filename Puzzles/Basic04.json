@@ -1,6 +1,7 @@
 ﻿{
   "name": "Basic04",
   "type": "Fill-A-Pix",
+  "clue": "warrior",
   "width": 10,
   "height": 15,
   "grid": [

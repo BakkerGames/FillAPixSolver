@@ -1,6 +1,7 @@
 ﻿{
   "name": "Basic02",
   "type": "Fill-A-Pix",
+  "clue": "wine",
   "width": 10,
   "height": 15,
   "grid": [

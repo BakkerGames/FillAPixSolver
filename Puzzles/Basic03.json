@@ -1,6 +1,7 @@
 ﻿{
   "name": "Basic03",
   "type": "Fill-A-Pix",
+  "clue": "cat",
   "width": 10,
   "height": 15,
   "grid": [

@@ -1,6 +1,7 @@
 {
   "name": "Basic01",
   "type": "Fill-A-Pix",
+  "clue": "bird",
   "width": 5,
   "height": 5,
   "grid": [
