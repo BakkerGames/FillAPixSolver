@@ -2,7 +2,7 @@
 
 namespace FillAPixSolver
 {
-    class FillAPixEngine
+    public class FillAPixEngine
     {
         private const char EMPTY = '.';
         private const char FILLED = '#';
