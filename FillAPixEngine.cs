@@ -18,6 +18,7 @@ namespace FillAPixSolver
                 answer.Add(new string(EMPTY, width));
             }
             puzzle["answer"] = answer;
+            puzzle["steps"] = new JArray();
         }
 
         public static void Solve(JObject puzzle)
@@ -70,6 +71,7 @@ namespace FillAPixSolver
                         string line = puzzle.GetArray("answer")[y1].ToString();
                         line = line[..x1] + NOTFILLED + line[(x1 + 1)..];
                         puzzle.GetArray("answer")[y1] = line;
+                        puzzle.GetArray("steps").Add($"{x1},{y1},0");
                     }
                 }
             }
@@ -93,6 +95,7 @@ namespace FillAPixSolver
                         string line = puzzle.GetArray("answer")[y1].ToString();
                         line = line[..x1] + FILLED + line[(x1 + 1)..];
                         puzzle.GetArray("answer")[y1] = line;
+                        puzzle.GetArray("steps").Add($"{x1},{y1},1");
                     }
                 }
             }

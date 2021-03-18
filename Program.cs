@@ -22,7 +22,7 @@ namespace FillAPixSolver
             JObject puzzle = JObject.Parse(puzzleText);
             FillAPixEngine.InitPuzzle(puzzle);
             FillAPixEngine.Solve(puzzle);
-            Console.WriteLine(puzzle.ToStringFormatted());
+            Console.WriteLine(((JArray)puzzle["answer"]).ToStringFormatted());
             return 0;
         }
     }
