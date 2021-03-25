@@ -1,4 +1,5 @@
 ﻿using JsonLibrary;
+using System;
 
 namespace FillAPixSolver
 {
@@ -36,21 +37,104 @@ namespace FillAPixSolver
                         char c = puzzle.GetArray("grid")[y].ToString()[x];
                         if (c < '0' || c > '9') continue;
                         int value = c - '0';
+                        // check for basic logic
                         GetCounts(puzzle, x, y, out int empty, out int filled, out int notFilled);
                         if (empty == 0) continue;
                         if (value == filled)
                         {
                             MarkNotFilled(puzzle, x, y);
                             changed = true;
+                            continue;
                         }
-                        else if (value == 9 - notFilled)
+                        if (value == 9 - notFilled)
                         {
                             MarkFilled(puzzle, x, y);
+                            changed = true;
+                            continue;
+                        }
+                        // check for advanced logic
+                        if (SolveAdvanced(puzzle, x, y))
+                        {
                             changed = true;
                         }
                     }
                 }
             } while (changed);
+        }
+        public static bool IsSolveFinished(JObject puzzle)
+        {
+            int height = (int)puzzle["height"];
+            for (int y = 0; y < height; y++)
+            {
+                string line = puzzle.GetArray("answer")[y].ToString();
+                if (line.Contains(EMPTY))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        #region private routines
+
+        private static bool SolveAdvanced(JObject puzzle, int x, int y)
+        {
+            int width = (int)puzzle["width"];
+            int height = (int)puzzle["height"];
+            bool changed = false;
+            char c1 = puzzle.GetArray("grid")[y].ToString()[x];
+            int value1 = c1 - '0';
+            JArray cells1 = GetCells(puzzle, x, y);
+            for (int y1 = y - 1; y1 <= y + 1; y1++)
+            {
+                for (int x1 = x - 1; x1 <= x + 1; x1++)
+                {
+                    if (x == x1 && y == y1) continue;
+                    if (y1 < 0 || y1 >= height || x1 < 0 || x1 >= width) continue;
+                    char c2 = puzzle.GetArray("grid")[y1].ToString()[x1];
+                    if (c2 < '0' || c2 > '9') continue;
+                    int value2 = c2 - '0';
+                    JArray cells2 = GetCells(puzzle, x1, y1);
+
+                    JArray common = GetCommon(cells1, cells2);
+                    JArray leftOnly = GetLeftOnly(cells1, cells2);
+                    JArray rightOnly = GetRightOnly(cells1, cells2);
+
+                    int minCommon = CountFilled(common);
+                    minCommon = Math.Max(minCommon, value1 - (leftOnly.Count() - CountNotFilled(leftOnly)));
+                    minCommon = Math.Max(minCommon, value2 - (rightOnly.Count() - CountNotFilled(rightOnly)));
+
+                    int maxCommon = common.Count() - CountNotFilled(common);
+                    maxCommon = Math.Min(maxCommon, value1 - (leftOnly.Count() - CountFilled(leftOnly)));
+                    maxCommon = Math.Min(maxCommon, value2 - (rightOnly.Count() - CountFilled(rightOnly)));
+
+                    if (CountEmpty(common) > 0 && minCommon == CountFilled(common) + CountEmpty(common))
+                    {
+                        MarkCellsFilled(puzzle, common);
+                        changed = true;
+                        continue;
+                    }
+                    if (CountEmpty(common) > 0 && maxCommon == CountNotFilled(common) + CountEmpty(common))
+                    {
+                        MarkCellsNotFilled(puzzle, common);
+                        changed = true;
+                        continue;
+                    }
+
+
+                    if (CountEmpty(leftOnly) > 0 && value1 - 
+                    {
+                        MarkCellsFilled(puzzle, leftOnly);
+                        changed = true;
+                    }
+//                    if (value2 > 0 && CountEmpty(rightOnly) > 0 && value2 == maxCommon + CountFilled(rightOnly) + CountEmpty(rightOnly))
+//                    {
+//                        MarkCellsFilled(puzzle, rightOnly);
+//                        changed = true;
+//                    }
+                }
+            }
+            return changed;
         }
 
         private static void MarkNotFilled(JObject puzzle, int x, int y)
@@ -135,5 +219,159 @@ namespace FillAPixSolver
                 }
             }
         }
+
+        private static JArray GetCells(JObject puzzle, int x, int y)
+        {
+            int width = (int)puzzle["width"];
+            int height = (int)puzzle["height"];
+            JArray result = new();
+            for (int y1 = y - 1; y1 <= y + 1; y1++)
+            {
+                for (int x1 = x - 1; x1 <= x + 1; x1++)
+                {
+                    if (y1 < 0 || y1 >= height || x1 < 0 || x1 >= width)
+                    {
+                        result.Add(new JArray { x1, y1, NOTFILLED });
+                    }
+                    else
+                    {
+                        char c = puzzle.GetArray("answer")[y1].ToString()[x1];
+                        result.Add(new JArray { x1, y1, c });
+                    }
+
+                }
+            }
+            return result;
+        }
+
+        private static JArray GetCommon(JArray cells1, JArray cells2)
+        {
+            JArray result = new();
+            foreach (JArray cell1 in cells1)
+            {
+                foreach (JArray cell2 in cells2)
+                {
+                    if (((int)cell1[0] == (int)cell2[0]) && ((int)cell1[1] == (int)cell2[1]))
+                    {
+                        result.Add(cell1);
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+
+        private static JArray GetLeftOnly(JArray cells1, JArray cells2)
+        {
+            JArray result = new();
+            foreach (JArray cell1 in cells1)
+            {
+                bool found = false;
+                foreach (JArray cell2 in cells2)
+                {
+                    if (((int)cell1[0] == (int)cell2[0]) && ((int)cell1[1] == (int)cell2[1]))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    result.Add(cell1);
+                }
+            }
+            return result;
+        }
+
+        private static JArray GetRightOnly(JArray cells1, JArray cells2)
+        {
+            JArray result = new();
+            foreach (JArray cell2 in cells2)
+            {
+                bool found = false;
+                foreach (JArray cell1 in cells1)
+                {
+                    if (((int)cell1[0] == (int)cell2[0]) && ((int)cell1[1] == (int)cell2[1]))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    result.Add(cell2);
+                }
+            }
+            return result;
+        }
+
+        private static int CountFilled(JArray cells)
+        {
+            int result = 0;
+            foreach (JArray cell in cells)
+            {
+                if ((char)cell[2] == FILLED)
+                    result++;
+            }
+            return result;
+        }
+
+        private static int CountNotFilled(JArray cells)
+        {
+            int result = 0;
+            foreach (JArray cell in cells)
+            {
+                if ((char)cell[2] == NOTFILLED)
+                    result++;
+            }
+            return result;
+        }
+
+        private static int CountEmpty(JArray cells)
+        {
+            int result = 0;
+            foreach (JArray cell in cells)
+            {
+                if ((char)cell[2] == EMPTY)
+                    result++;
+            }
+            return result;
+        }
+
+        private static void MarkCellsFilled(JObject puzzle, JArray cells)
+        {
+            foreach (JArray cell in cells)
+            {
+                if ((char)cell[2] == EMPTY)
+                {
+                    int x1 = (int)cell[0];
+                    int y1 = (int)cell[1];
+                    string line = puzzle.GetArray("answer")[y1].ToString();
+                    line = line[..x1] + FILLED + line[(x1 + 1)..];
+                    puzzle.GetArray("answer")[y1] = line;
+                    puzzle.GetArray("steps").Add($"{x1},{y1},1");
+                    cell[2] = FILLED;
+                }
+            }
+        }
+
+        private static void MarkCellsNotFilled(JObject puzzle, JArray cells)
+        {
+            foreach (JArray cell in cells)
+            {
+                if ((char)cell[2] == EMPTY)
+                {
+                    int x1 = (int)cell[0];
+                    int y1 = (int)cell[1];
+                    string line = puzzle.GetArray("answer")[y1].ToString();
+                    line = line[..x1] + NOTFILLED + line[(x1 + 1)..];
+                    puzzle.GetArray("answer")[y1] = line;
+                    puzzle.GetArray("steps").Add($"{x1},{y1},0");
+                    cell[2] = NOTFILLED;
+                }
+            }
+        }
+
+        #endregion
     }
 }
