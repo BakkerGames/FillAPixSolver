@@ -54,6 +54,7 @@ namespace FillAPixSolver
                         if (SolveBasic(puzzle, x, y))
                         {
                             changed = true;
+                            continue;
                         }
 
                         //                        GetCounts(puzzle, x, y, out int unknown, out int filled, out int notFilled);
@@ -102,7 +103,7 @@ namespace FillAPixSolver
                             if (((char[,])puzzle["answer"])[x1, y1] == UNKNOWN)
                             {
                                 ((char[,])puzzle["answer"])[x1, y1] = NOTFILLED;
-                                //todo add step
+                                ((JArray)puzzle["steps"]).Add($"{x1},{y1},{NOTFILLED}");
                                 changed = true;
                             }
                         }
@@ -122,7 +123,7 @@ namespace FillAPixSolver
                             if (((char[,])puzzle["answer"])[x1, y1] == UNKNOWN)
                             {
                                 ((char[,])puzzle["answer"])[x1, y1] = FILLED;
-                                //todo add step
+                                ((JArray)puzzle["steps"]).Add($"{x1},{y1},{FILLED}");
                                 changed = true;
                             }
                         }
