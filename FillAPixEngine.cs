@@ -115,9 +115,9 @@ namespace FillAPixSolver
             bool changed = false;
             int height = (int)puzzle["height"];
             int width = (int)puzzle["width"];
-            for (int y1 = y - 1; y1 <= y + 1; y1++)
+            for (int y1 = y - 2; y1 <= y + 2; y1++)
             {
-                for (int x1 = x - 1; x1 <= x + 1; x1++)
+                for (int x1 = x - 2; x1 <= x + 2; x1++)
                 {
                     if (x == x1 && y == y1) continue;
                     if (y1 < 0 || y1 >= height || x1 < 0 || x1 >= width) continue;
