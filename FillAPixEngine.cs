@@ -238,6 +238,7 @@ namespace FillAPixSolver
                 if (((char[,])puzzle["answer"])[y, x] == UNKNOWN)
                 {
                     ((char[,])puzzle["answer"])[y, x] = NOTFILLED;
+                    ((JArray)puzzle["steps"]).Add($"{y},{x},0");
                 }
             }
         }
@@ -254,6 +255,7 @@ namespace FillAPixSolver
                 if (((char[,])puzzle["answer"])[y, x] == UNKNOWN)
                 {
                     ((char[,])puzzle["answer"])[y, x] = FILLED;
+                    ((JArray)puzzle["steps"]).Add($"{y},{x},1");
                 }
             }
         }
