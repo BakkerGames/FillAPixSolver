@@ -68,59 +68,6 @@ namespace FillAPixSolver
             } while (changed);
         }
 
-        private static bool SolveBasic(JObject puzzle, int y, int x)
-        {
-            JObject info = GetInfo(puzzle, y, x);
-            if ((int)info["unknown"] == 0)
-            {
-                return false;
-            }
-            bool changed = false;
-            int height = (int)puzzle["height"];
-            int width = (int)puzzle["width"];
-            if ((int)info["value"] == (int)info["filled"])
-            {
-                for (int y1 = y - 1; y1 <= y + 1; y1++)
-                {
-                    for (int x1 = x - 1; x1 <= x + 1; x1++)
-                    {
-                        if (y1 < 0 || y1 >= height || x1 < 0 || x1 >= width)
-                        {
-                            // beyond edges of grid
-                            continue;
-                        }
-                        if (((char[,])puzzle["answer"])[y1, x1] == UNKNOWN)
-                        {
-                            ((char[,])puzzle["answer"])[y1, x1] = NOTFILLED;
-                            ((JArray)puzzle["steps"]).Add($"{y1},{x1},0");
-                            changed = true;
-                        }
-                    }
-                }
-            }
-            else if (9 - (int)info["value"] == (int)info["notfilled"])
-            {
-                for (int y1 = y - 1; y1 <= y + 1; y1++)
-                {
-                    for (int x1 = x - 1; x1 <= x + 1; x1++)
-                    {
-                        if (y1 < 0 || y1 >= height || x1 < 0 || x1 >= width)
-                        {
-                            // beyond edges of grid
-                            continue;
-                        }
-                        if (((char[,])puzzle["answer"])[y1, x1] == UNKNOWN)
-                        {
-                            ((char[,])puzzle["answer"])[y1, x1] = FILLED;
-                            ((JArray)puzzle["steps"]).Add($"{y1},{x1},1");
-                            changed = true;
-                        }
-                    }
-                }
-            }
-            return changed;
-        }
-
         public static bool IsSolveFinished(JObject puzzle)
         {
             for (int y = 0; y < (int)puzzle["height"]; y++)
@@ -134,6 +81,27 @@ namespace FillAPixSolver
                 }
             }
             return true;
+        }
+
+        private static bool SolveBasic(JObject puzzle, int y, int x)
+        {
+            JObject info = GetInfo(puzzle, y, x);
+            if ((int)info["unknown"] == 0)
+            {
+                return false;
+            }
+            bool changed = false;
+            if ((int)info["value"] == (int)info["filled"])
+            {
+                MarkNotFilled(puzzle, info);
+                changed = true;
+            }
+            else if ((int)info["count"] - (int)info["value"] == (int)info["notfilled"])
+            {
+                MarkFilled(puzzle, info);
+                changed = true;
+            }
+            return changed;
         }
 
         private static bool SolveAdvanced(JObject puzzle, int y, int x)
@@ -266,6 +234,7 @@ namespace FillAPixSolver
             int height = (int)puzzle["height"];
             int width = (int)puzzle["width"];
             result["value"] = ((int[,])puzzle["values"])[y, x];
+            result["count"] = 0;
             result["unknown"] = 0;
             result["notfilled"] = 0;
             result["filled"] = 0;
@@ -300,6 +269,7 @@ namespace FillAPixSolver
                     }
                 }
             }
+            result["count"] = ((JArray)result["cells"]).Count();
             return result;
         }
 
@@ -308,6 +278,7 @@ namespace FillAPixSolver
             JObject result = new();
             int height = (int)puzzle["height"];
             int width = (int)puzzle["width"];
+            result["count"] = 0;
             result["unknown"] = 0;
             result["notfilled"] = 0;
             result["filled"] = 0;
@@ -356,6 +327,7 @@ namespace FillAPixSolver
             JObject result = new();
             int height = (int)puzzle["height"];
             int width = (int)puzzle["width"];
+            result["count"] = 0;
             result["unknown"] = 0;
             result["notfilled"] = 0;
             result["filled"] = 0;
@@ -410,6 +382,7 @@ namespace FillAPixSolver
             JObject result = new();
             int height = (int)puzzle["height"];
             int width = (int)puzzle["width"];
+            result["count"] = 0;
             result["unknown"] = 0;
             result["notfilled"] = 0;
             result["filled"] = 0;
