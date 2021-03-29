@@ -2,7 +2,7 @@
   "profiles": {
     "FillAPixSolver": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Projects\\FillAPixSolver\\Puzzles\\Basic01.json\"",
+      "commandLineArgs": "\"C:\\Projects\\FillAPixSolver\\Puzzles\\Advanced01.json\"",
       "sqlDebugging": false
     }
   }

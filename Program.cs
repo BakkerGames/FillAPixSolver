@@ -37,7 +37,7 @@ namespace FillAPixSolver
             }
             else
             {
-                Console.WriteLine(puzzle["clue"]);
+                Console.WriteLine($"Clue = {puzzle["clue"]}");
             }
             return 0;
         }
