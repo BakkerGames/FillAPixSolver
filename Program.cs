@@ -22,22 +22,23 @@ namespace FillAPixSolver
             JObject puzzle = JObject.Parse(puzzleText);
             FillAPixEngine.InitPuzzle(puzzle);
             FillAPixEngine.Solve(puzzle);
-            for (int y = 0; y < (int)puzzle["height"]; y++)
+            //for (int y = 0; y < (int)puzzle["height"]; y++)
+            //{
+            //    for (int x = 0; x < (int)puzzle["width"]; x++)
+            //    {
+            //        Console.Write(((char[,])puzzle["answer"])[x, y]);
+            //    }
+            //    Console.WriteLine();
+            //}
+            Console.WriteLine(puzzle.ToStringFormatted());
+            if (!FillAPixEngine.IsSolveFinished(puzzle))
             {
-                for (int x = 0; x < (int)puzzle["width"]; x++)
-                {
-                    Console.Write(((char[,])puzzle["answer"])[x, y]);
-                }
-                Console.WriteLine();
+                Console.WriteLine("Could not solve puzzle!");
             }
-            //            if (!FillAPixEngine.IsSolveFinished(puzzle))
-            //            {
-            //                Console.WriteLine("Could not solve puzzle!");
-            //            }
-            //            else
-            //            {
-            //                Console.WriteLine(puzzle["clue"]);
-            //            }
+            else
+            {
+                Console.WriteLine(puzzle["clue"]);
+            }
             return 0;
         }
     }
